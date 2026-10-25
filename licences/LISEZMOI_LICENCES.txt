@@ -1,0 +1,41 @@
+﻿LICENCES DES COMPOSANTS LIVRÉS
+==============================
+
+Le programme moteur\Recherche_PDF.exe contient les composants suivants.
+
+PyMuPDF 1.28.2 et MuPDF (Artifex Software)
+  Licence : GNU Affero General Public License v3 (AGPL-3.0)      -> PyMuPDF-MuPDF-AGPL-3.0.txt
+  Lecture des PDF et OCR. La bibliothèque MuPDF intègre aussi Tesseract, Leptonica et
+  d'autres bibliothèques tierces (notamment FreeType, HarfBuzz, jbig2dec, Little CMS,
+  libjpeg, OpenJPEG, zlib), chacune sous sa propre licence.
+  Code source : https://github.com/pymupdf/PyMuPDF (version 1.28.2)
+                https://mupdf.com/releases (notices complètes dans le dossier thirdparty)
+  Conformément à l'AGPL, le code source de ce programme et ses instructions de
+  construction sont fournis dans le dossier source\.
+
+Tesseract OCR (moteur de reconnaissance de texte, intégré à MuPDF)
+  Licence : Apache License 2.0                                    -> Tesseract-LICENSE.txt
+  https://github.com/tesseract-ocr/tesseract
+
+Données de langue Tesseract (moteur\tesseract\tessdata\)
+  fra.traineddata (dépôt tessdata), eng.traineddata (dépôt tessdata_fast)
+  Licence : Apache License 2.0                                    -> tessdata-LICENSE.txt
+  https://github.com/tesseract-ocr/tessdata
+  https://github.com/tesseract-ocr/tessdata_fast
+
+Leptonica (traitement d'images utilisé par Tesseract, intégré à MuPDF)
+  Licence : type BSD (2 clauses)                                  -> Leptonica-LICENSE.txt
+  https://github.com/DanBloomberg/leptonica
+
+openpyxl 3.1.5 (écriture du fichier Excel)
+  Licence : MIT                                                   -> openpyxl-LICENSE.txt
+
+et_xmlfile 2.0.0 (utilisé par openpyxl)
+  Licence : MIT                                                   -> et_xmlfile-LICENSE.txt
+
+Python 3.14 (interpréteur intégré à l'exécutable)
+  Licence : Python Software Foundation License                    -> Python-LICENSE.txt
+
+PyInstaller 6.22.3 (lanceur de l'exécutable)
+  Licence : GPL 2.0 avec exception pour le lanceur, qui autorise la diffusion
+  d'exécutables construits avec PyInstaller sous une autre licence -> PyInstaller-COPYING.txt

@@ -1,0 +1,96 @@
+﻿RECHERCHE DANS LES PDF
+Diagne Digital & Tech
+======================
+
+
+À QUOI SERT CET OUTIL ?
+-----------------------
+Vous tapez un numéro de colis, par exemple COLIS-2026-00481.
+L'outil cherche ce numéro dans tous les PDF d'un dossier (sous-dossiers et
+documents scannés compris) et recopie dans Excel les nombres qu'il trouve :
+montants, poids, dates, numéros de téléphone...
+
+
+CONTENU DU DOSSIER
+------------------
+  Recherche_PDF.xlsm         le classeur Excel avec le bouton « Rechercher »
+  PDF_Colis\                 le dossier des PDF utilisé par défaut
+  moteur\                    le programme (ne rien modifier ni déplacer dedans)
+  LICENCES\  et  source\     informations légales
+
+
+INSTALLATION
+------------
+1. Copiez le dossier Recherche_PDF en entier dans C:\DDT\ (créez ce dossier si
+   besoin), pour obtenir C:\DDT\Recherche_PDF. Ne le mettez pas dans Documents,
+   sur le Bureau ni dans OneDrive : ces dossiers sont souvent synchronisés, ce
+   qui peut bloquer l'outil.
+
+2. Si vous avez reçu l'outil par e-mail ou par Internet, Windows bloque les macros.
+   Avant d'extraire le fichier .zip : clic droit sur le .zip > Propriétés >
+   cochez « Débloquer » > OK. Extrayez-le ensuite.
+   (Si c'est déjà extrait : faites la même chose sur Recherche_PDF.xlsm.)
+
+3. À la première ouverture du classeur, si Excel affiche une barre jaune
+   « Activer le contenu », cliquez dessus.
+
+
+FAIRE UNE RECHERCHE
+-------------------
+1. Ouvrez Recherche_PDF.xlsm, feuille « Recherche ».
+2. Tapez le numéro dans la case B2.
+3. Facultatif : tapez en B3 le dossier où sont les PDF, par exemple
+   D:\Archives\Colis 2026. Si B3 est vide, l'outil utilise le dossier PDF_Colis.
+4. Cliquez sur « Rechercher ».
+
+Le résultat apparaît dans deux feuilles :
+  - « Résultats » : un PDF par ligne (cliquez sur le nom pour l'ouvrir), la page,
+    la référence trouvée, les nombres, et la façon dont la page a été lue
+    (« texte » ou « OCR » pour un document scanné).
+  - « Non analysés » : les PDF que l'outil n'a pas pu lire (protégés par mot de
+    passe, abîmés, scans illisibles). Vérifiez-les à la main.
+
+Important : la case B2 doit être au format Texte, sinon Excel supprime les zéros
+du début (00481 devient 481). Si l'outil vous le signale : clic droit sur B2 >
+Format de cellule > Texte, puis retapez le numéro.
+
+
+LA PREMIÈRE RECHERCHE EST PLUS LONGUE
+-------------------------------------
+La première fois, l'outil lit tous les PDF. Les documents scannés demandent
+environ une demi-seconde par page : pour plusieurs centaines de scans, comptez
+quelques minutes. Ensuite, il garde ce qu'il a lu : les recherches suivantes
+prennent une ou deux secondes, et seuls les PDF nouveaux ou modifiés sont relus.
+
+Si votre technicien a activé la préparation automatique, les nouveaux PDF sont
+lus chaque matin et vos recherches restent rapides.
+
+
+SI LE BOUTON NE FONCTIONNE PAS (solution de secours)
+---------------------------------------------------
+Double-cliquez sur moteur\Recherche_PDF.exe.
+Une fenêtre noire s'ouvre :
+  - tapez le numéro, puis Entrée ;
+  - tapez le dossier des PDF, ou appuyez simplement sur Entrée pour PDF_Colis.
+Le résultat est enregistré dans votre dossier Documents et s'ouvre dans Excel.
+
+Si Windows affiche « Windows a protégé votre ordinateur » : cliquez sur
+« Informations complémentaires » puis « Exécuter quand même ».
+
+
+EN CAS DE PROBLÈME
+------------------
+- « Moteur introuvable » : le classeur a été déplacé. Remettez-le dans le dossier
+  Recherche_PDF, à côté du dossier moteur.
+- Un PDF manque dans les résultats : regardez la feuille « Non analysés ».
+- L'antivirus bloque moteur\Recherche_PDF.exe : voir CONTACT ci-dessous.
+- Pour tout autre message d'erreur : faites une capture d'écran du message et
+  envoyez-la avec le fichier journal.txt qui se trouve à côté du classeur
+  (voir CONTACT ci-dessous).
+
+
+CONTACT
+-------
+Diagne Digital & Tech
+Téléphone / WhatsApp : +224 614 68 18 60
+E-mail : abdoulayedjibril2006@gmail.com

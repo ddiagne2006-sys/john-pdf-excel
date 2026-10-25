@@ -1,0 +1,171 @@
+﻿RECHERCHE_PDF - GUIDE D'INSTALLATION (TECHNICIEN)
+Diagne Digital & Tech - document interne, ne pas remettre au client
+==================================================================
+
+SOMMAIRE
+  A. Installation chez le client
+  B. Préparation automatique (tâche planifiée)
+  C. Emplacement des scripts dans la livraison
+  D. Dépannage
+  E. Contact
+
+
+A. INSTALLATION CHEZ LE CLIENT
+------------------------------
+Rien à installer d'autre : le poste n'a besoin ni de Python ni de Tesseract
+(le moteur et les langues OCR sont dans moteur\).
+
+1. Débloquer le .zip AVANT de l'extraire
+   Clic droit sur le .zip > Propriétés > cocher « Débloquer » > OK.
+   Sinon Windows marque tous les fichiers comme venant d'Internet : Excel bloque
+   les macros et SmartScreen avertit au lancement de l'exe.
+   Déjà extrait : en PowerShell,
+     Get-ChildItem C:\DDT\Recherche_PDF -Recurse | Unblock-File
+
+2. Copier dans C:\DDT\Recherche_PDF
+   Créer C:\DDT si besoin et y copier le dossier Recherche_PDF en entier.
+   Éviter Documents, le Bureau et OneDrive (synchronisation, verrous de fichiers,
+   chemins renvoyés en https:// par Excel).
+   Vérifier que l'utilisateur peut écrire dans C:\DDT\Recherche_PDF : la macro y
+   écrit journal.txt et le classeur y est enregistré. Si le dossier a été créé
+   avec un compte administrateur, donner « Modification » à l'utilisateur.
+
+3. Activer les macros
+   Ouvrir Recherche_PDF.xlsm et cliquer sur « Activer le contenu ».
+   Si le bandeau rouge « Microsoft a bloqué l'exécution des macros » apparaît,
+   le fichier est encore marqué Internet : revenir à l'étape 1.
+   En entreprise, une stratégie de groupe peut interdire les macros : ajouter
+   C:\DDT\Recherche_PDF aux emplacements approuvés (Fichier > Options > Centre de
+   gestion de la confidentialité > Emplacements approuvés), ou utiliser le
+   plan B (D.5).
+
+4. Format Texte de B2
+   Feuille « Recherche », cellule B2 : clic droit > Format de cellule > Texte.
+   Sans cela, 00481 devient 481 ; la macro refuse alors le numéro.
+   Montrer au client qu'il faut retaper le numéro si le format a été changé après
+   la saisie.
+
+5. Première indexation sur le dossier du client
+   À faire pendant l'installation, pour que la première recherche soit rapide :
+     C:\DDT\Recherche_PDF\moteur\Recherche_PDF.exe --indexer-seulement --dossier "D:\Archives\Colis"
+   Temps estimé : environ 0,4 s par page scannée (OCR), quelques millisecondes
+   par PDF texte. Exemple : 1 000 pages scannées = environ 7 minutes.
+   La progression s'affiche toutes les 10 PDF (« 30/250 PDF… »).
+   À la fin : « Index : X PDF lus, Y depuis le cache, Z retirés ».
+   Renseigner ensuite ce dossier en B3 de la feuille « Recherche » (B3 vide =
+   C:\DDT\Recherche_PDF\PDF_Colis).
+
+6. Test de bout en bout
+   Saisir un numéro connu en B2, cliquer sur « Rechercher » : la deuxième
+   recherche doit prendre une ou deux secondes.
+
+
+B. PRÉPARATION AUTOMATIQUE (TÂCHE PLANIFIÉE)
+--------------------------------------------
+Facultatif. Les nouveaux PDF sont lus chaque matin, sans fenêtre, et les
+recherches du client restent rapides. Aucun droit administrateur n'est
+nécessaire. À lancer avec le compte Windows du client (la tâche est créée pour
+l'utilisateur connecté).
+
+Installer :
+  powershell -ExecutionPolicy Bypass -File C:\DDT\Recherche_PDF\source\installer_indexation.ps1 -Dossier "D:\Archives\Colis"
+
+Ce qui est créé :
+  - une tâche « DDT Recherche PDF - Indexation » pour l'utilisateur courant ;
+  - action : moteur\Recherche_PDF_silencieux.exe --indexer-seulement --dossier "<dossier>"
+    (même programme que Recherche_PDF.exe, sans fenêtre) ;
+  - déclencheurs : chaque jour à 7 h, et 2 minutes après l'ouverture de session ;
+  - si l'ordinateur était éteint à 7 h, la tâche part dès qu'il est allumé ;
+    elle tourne aussi sur batterie, une seule instance à la fois, 4 h au maximum.
+  Pour changer de dossier, relancer le script avec le nouveau -Dossier (la tâche
+  est remplacée).
+
+Vérifier que la tâche existe :
+  Get-ScheduledTask -TaskName 'DDT Recherche PDF - Indexation'
+
+La lancer à la main pour tester, puis lire le résultat :
+  Start-ScheduledTask -TaskName 'DDT Recherche PDF - Indexation'
+  Get-ScheduledTaskInfo -TaskName 'DDT Recherche PDF - Indexation'
+  LastTaskResult = 0 : succès ; 1 : erreur (dossier introuvable, index inutilisable).
+  La tâche n'a pas de fenêtre ni de journal : en cas d'erreur, lancer la même
+  commande avec moteur\Recherche_PDF.exe dans une console pour voir le message.
+
+Si le déclencheur « ouverture de session » est refusé :
+  Sur certains postes, Windows refuse ce déclencheur sans droits administrateur.
+  Le script affiche alors un avertissement et installe quand même la tâche de 7 h
+  seule. C'est suffisant dans la plupart des cas. Pour ajouter le déclencheur :
+  Planificateur de tâches > tâche « DDT Recherche PDF - Indexation » > Propriétés >
+  Déclencheurs > Nouveau > « À l'ouverture de session », utilisateur du client.
+  Ne pas relancer le script dans une console administrateur ouverte avec un autre
+  compte : la tâche serait créée pour ce compte, pas pour le client.
+
+Retirer :
+  powershell -ExecutionPolicy Bypass -File C:\DDT\Recherche_PDF\source\desinstaller_indexation.ps1
+  Ajouter -SupprimerIndex pour effacer aussi les index (%LOCALAPPDATA%\DDT_Recherche_PDF).
+
+
+C. EMPLACEMENT DES SCRIPTS DANS LA LIVRAISON
+--------------------------------------------
+installer_indexation.ps1 et desinstaller_indexation.ps1 sont dans source\, pas à
+la racine du dossier livré : le client n'a pas à les voir. build.ps1 les y copie,
+avec ce guide. installer_indexation.ps1 trouve le moteur dans le dossier parent
+(source\..\moteur\) : garder l'arborescence telle quelle.
+
+Arborescence livrée :
+  Recherche_PDF.xlsm             (à ajouter après build.ps1)
+  LISEZMOI.txt                   document client
+  PDF_Colis\                     dossier des PDF par défaut
+  moteur\Recherche_PDF.exe       macro, ligne de commande, double-clic
+  moteur\Recherche_PDF_silencieux.exe   tâche planifiée
+  moteur\_internal\              Python, PyMuPDF, openpyxl
+  moteur\tesseract\tessdata\     fra.traineddata, eng.traineddata
+  LICENCES\                      licences (PyMuPDF AGPL, Tesseract, tessdata...)
+  source\                        sources (AGPL), scripts de tâche, ce guide
+
+
+D. DÉPANNAGE
+------------
+1. journal.txt
+   À côté du classeur. Contient la sortie de la dernière recherche lancée par la
+   macro (avertissements, erreurs, nombre de PDF trouvés). En cas d'erreur, la
+   macro en affiche la fin dans un message.
+
+2. Index
+   %LOCALAPPDATA%\DDT_Recherche_PDF\index_<empreinte>.sqlite, un fichier par
+   dossier de PDF. Jamais dans le dossier des PDF. Il se met à jour à chaque
+   recherche (PDF nouveaux, modifiés ou supprimés). S'il est abîmé, il est
+   reconstruit automatiquement (avertissement dans journal.txt).
+
+3. Résultats incohérents : reconstruire l'index
+     C:\DDT\Recherche_PDF\moteur\Recherche_PDF.exe --indexer-seulement --reindexer --dossier "D:\Archives\Colis"
+   ou supprimer le fichier .sqlite. Comparer avec une lecture directe :
+     ... Recherche_PDF.exe COLIS-2026-00481 --sans-index --dossier "D:\Archives\Colis" --sortie "%TEMP%\test.xlsx"
+
+4. SmartScreen et antivirus
+   L'exe n'est pas signé. SmartScreen : « Informations complémentaires » >
+   « Exécuter quand même » (le déblocage du .zip, A.1, l'évite souvent).
+   Antivirus : ajouter une exclusion pour C:\DDT\Recherche_PDF\moteur\.
+   Le premier lancement après la copie prend 2 à 3 s (analyse antivirus), puis
+   environ 0,5 s.
+
+5. Macro bloquée : plan B
+   Double-clic sur moteur\Recherche_PDF.exe : le numéro puis le dossier sont
+   demandés (Entrée = PDF_Colis). Le résultat est enregistré dans Documents
+   (Recherche_PDF_<numéro>_<date>.xlsx) et s'ouvre dans Excel. En cas d'erreur, la
+   fenêtre attend Entrée pour que le message reste lisible.
+
+6. Scans non lus (« OCR non disponible »)
+   Vérifier que moteur\tesseract\tessdata contient fra.traineddata et
+   eng.traineddata. Ces pages sont relues automatiquement à la recherche suivante
+   une fois le problème corrigé.
+
+7. « Moteur introuvable »
+   Le classeur n'est plus à côté du dossier moteur. Le remettre dans
+   C:\DDT\Recherche_PDF.
+
+
+E. CONTACT
+----------
+Diagne Digital & Tech
+Téléphone / WhatsApp : +224 614 68 18 60
+E-mail : abdoulayedjibril2006@gmail.com
